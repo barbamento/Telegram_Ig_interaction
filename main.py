@@ -2,6 +2,8 @@ import json
 
 from Code.Utils.Logger import create_logger
 from Code.Bot import Bot
+from Code.Telegram.Bot import Bot as TG_Bot
+
 
 if __name__ == "__main__":
     page = "NotizieIA"
@@ -13,7 +15,5 @@ if __name__ == "__main__":
         ["fb", "insta"],
         logger,
     )
-    b.post_photo(
-        # "Centrali nucleari senza autorizzazione, la maggioranza tenta il blitz notturno",
-        # image_path="data/prova.jpg"
-    )
+    tg = TG_Bot(notizieIA, logger, b.post_photo)
+    tg.start()

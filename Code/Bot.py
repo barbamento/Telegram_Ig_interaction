@@ -22,7 +22,9 @@ class Bot:
         self.apps = apps
         self.task = task
 
-    def post_photo(self, caption: str, image_path):
+    def post_photo(self, entities):
+        caption = entities["caption"] + "\n" + entities["url"]
+        image_path = entities["path"]
         for app in self.apps.values():
             if isinstance(app, Instagram):
                 app.post_image(caption, image_path)
