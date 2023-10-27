@@ -8,7 +8,6 @@ packages = [{include = "telegram_ig_interaction"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.13"
-pandas = "^2.1.1"
 python-telegram-bot = "^20.6"
 requests = "^2.31.0"
 black = "^23.10.1"

@@ -3,3 +3,5 @@ data/*
 secrets/*
 *.pyc
 tests.py
+Python-3.10.6
+*.tgz
