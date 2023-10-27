@@ -38,11 +38,13 @@ class Bot:
             )
         )
         self.logger.info(f"starting telegram bot for page id : {self.full_id}")
-        self.app.run_polling(allowed_updates=Update.ALL_TYPES)
+        self.app.run_polling(
+            drop_pending_updates=True, allowed_updates=Update.ALL_TYPES
+        )
 
     async def parse_post(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         self.logger.info(f"update : {update}")
-        if str(update.message.chat_id) == self.full_id:
+        if str(update.message.chat.id) == self.full_id:
             if str(update.message.from_user.id) in self.task["telegram"]["admins"]:
                 if not update.message.reply_to_message:
                     self.logger.warning("No post selected")
@@ -86,7 +88,6 @@ class Bot:
 async def parse_NotizieIA_post(
     app: Bot, update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    app.logger.info(f"update : {update}")
     if str(update.message.chat_id) == app.full_id:
         if str(update.message.from_user.id) in app.task["telegram"]["admins"]:
             if not update.message.reply_to_message:
