@@ -23,7 +23,9 @@ class Bot:
         self.task = task
 
     def post_photo(self, entities):
-        caption = entities["caption"] + " : " + entities["url"]
+        caption = entities["caption"]
+        if "url" in entities:
+            caption += " : " + entities["url"]
         if "thumb_path" in entities:
             image_path = [entities["path"]] + [entities["thumb_path"]]
         else:
