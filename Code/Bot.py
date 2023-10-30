@@ -31,7 +31,7 @@ class Bot:
         for app in self.apps.values():
             if isinstance(app, Instagram):
                 try:
-                app.post_image(caption, image_path)
+                    app.post_image(caption, image_path)
                 except Exception as e:
                     self.logger.warning(f"Ig error : {e}")
             elif isinstance(app, Facebook):
