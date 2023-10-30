@@ -10,6 +10,7 @@ from typing import Callable
 from pathlib import Path
 from httpx import ConnectError
 import time
+import asyncio
 
 from .TelegramUtils import extract_photos
 
@@ -42,15 +43,12 @@ class Bot:
             )
         )
         self.logger.info(f"starting telegram bot for page id : {self.full_id}")
-        while 1:
-            try:
-                self.app.run_polling(allowed_updates=Update.ALL_TYPES)
-            except ConnectError:
-                self.logger.warning(f"connect error. waiting for 10 sec")
-                time.sleep(10)
-            except Exception as e:
-                self.logger.warning(f"{e} error. waiting for 30 sec")
-                time.sleep(20)
+        self.app.run_polling(
+            allowed_updates=Update.ALL_TYPES,
+            read_timeout=5,
+            connect_timeout=300,
+            pool_timeout=300,
+        )
 
     async def parse_post(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE, reply: bool = False
@@ -58,6 +56,9 @@ class Bot:
         self.logger.info(f"update : {update}")
         if str(update.message.chat.id) == self.full_id:
             if str(update.message.from_user.id) in self.task["telegram"]["admins"]:
+                # await context.bot.delete_message(
+                #    update.message.chat.id, update.message.id
+                # )
                 if not update.message.reply_to_message:
                     self.logger.warning("No post selected")
                     if reply:
