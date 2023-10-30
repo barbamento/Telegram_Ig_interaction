@@ -46,10 +46,10 @@ class Bot:
             try:
                 self.app.run_polling(allowed_updates=Update.ALL_TYPES)
             except ConnectError:
-                self.logger(f"connect error. waiting for 10 sec")
+                self.logger.warning(f"connect error. waiting for 10 sec")
                 time.sleep(10)
             except Exception as e:
-                self.logger(f"{e} error. waiting for 30 sec")
+                self.logger.warning(f"{e} error. waiting for 30 sec")
                 time.sleep(20)
 
     async def parse_post(
