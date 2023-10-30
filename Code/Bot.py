@@ -23,11 +23,20 @@ class Bot:
         self.task = task
 
     def post_photo(self, entities):
-        caption = entities["caption"] + "\n" + entities["url"]
-        image_path = entities["path"]
+        caption = entities["caption"] + " : " + entities["url"]
+        if "thumb_path" in entities:
+            image_path = [entities["path"] + entities["thumb_path"]]
+        else:
+            image_path = entities["path"]
         for app in self.apps.values():
             if isinstance(app, Instagram):
-                app.post_image(caption, image_path)
+                try:
+                    app.post_image(caption, image_path)
+                except Exception as e:
+                    self.logger.warning(f"Ig error : {e}")
             elif isinstance(app, Facebook):
-                app.post_image(caption, image_path)
+                try:
+                    app.post_image(caption, image_path)
+                except Exception as e:
+                    self.logger.warning(f"FB error : {e}")
         self.logger.info("image posted on all apps")

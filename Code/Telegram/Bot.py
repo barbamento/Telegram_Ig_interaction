@@ -8,6 +8,10 @@ from telegram.ext import (
 from logging import Logger
 from typing import Callable
 from pathlib import Path
+from httpx import ConnectError
+import time
+
+from .TelegramUtils import extract_photos
 
 
 class Bot:
@@ -38,21 +42,30 @@ class Bot:
             )
         )
         self.logger.info(f"starting telegram bot for page id : {self.full_id}")
-        self.app.run_polling(
-            drop_pending_updates=True, allowed_updates=Update.ALL_TYPES
-        )
+        while 1:
+            try:
+                self.app.run_polling(allowed_updates=Update.ALL_TYPES)
+            except ConnectError:
+                self.logger(f"connect error. waiting for 10 sec")
+                time.sleep(10)
+            except Exception as e:
+                self.logger(f"{e} error. waiting for 30 sec")
+                time.sleep(20)
 
-    async def parse_post(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def parse_post(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE, reply: bool = False
+    ):
         self.logger.info(f"update : {update}")
         if str(update.message.chat.id) == self.full_id:
             if str(update.message.from_user.id) in self.task["telegram"]["admins"]:
                 if not update.message.reply_to_message:
                     self.logger.warning("No post selected")
-                    await context.bot.send_message(
-                        update.message.chat.id,
-                        text="No post selected,try again",
-                        reply_to_message_id=update.message.id,
-                    )
+                    if reply:
+                        await context.bot.send_message(
+                            update.message.chat.id,
+                            text="No post selected,try again",
+                            reply_to_message_id=update.message.id,
+                        )
                 else:
                     entities = {
                         "caption": update.message.reply_to_message.caption,
@@ -62,67 +75,36 @@ class Bot:
                             if entity.type == MessageEntityType.TEXT_LINK:
                                 entities["url"] = entity.url
                     if update.message.reply_to_message.photo:
-                        photos = {}
-                        for photo in update.message.reply_to_message.photo:
-                            photos[photo.file_size] = photo
                         Path(f"data/{self.page_id}").mkdir(parents=True, exist_ok=True)
+                        photos = extract_photos(update.message)
+                        photo = photos[max(photos)]
                         path = f"data/{self.page_id}/{photo.file_unique_id}.jpg"
-                        file = await context.bot.get_file(photos[max(photos)])
+                        file = await context.bot.get_file(photo)
                         await file.download_to_drive(path)
                         entities["path"] = path
+                        if update.message.photo:
+                            photos = extract_photos(update.message)
+                            photo = photos[max(photos)]
+                            thumb_file = await context.bot.get_file(photo)
+                            path_thumb = (
+                                f"data/{self.page_id}/{photo.file_unique_id}_thumb.jpg"
+                            )
+                            thumb_file = await context.bot.get_file(
+                                photo.file_unique_id
+                            )
+                            await thumb_file.download_to_drive(path_thumb)
+                            entities["thumb_path"] = path
                         self.on_good_posts(entities)
                         return True, entities
                     else:
                         self.logger.warning("No image in selected post")
-                        await context.bot.send_message(
-                            update.message.chat.id,
-                            text="No image in selected post,try again",
-                            reply_to_message_id=update.message.id,
-                        )
+                        if reply:
+                            await context.bot.send_message(
+                                update.message.chat.id,
+                                text="No image in selected post,try again",
+                                reply_to_message_id=update.message.id,
+                            )
                         return False, {}
         else:
             self.logger.info(f"chat {update.message.chat} not intresting")
         return False, {}
-
-
-async def parse_NotizieIA_post(
-    app: Bot, update: Update, context: ContextTypes.DEFAULT_TYPE
-):
-    if str(update.message.chat_id) == app.full_id:
-        if str(update.message.from_user.id) in app.task["telegram"]["admins"]:
-            if not update.message.reply_to_message:
-                app.logger.warning("No post selected")
-                await context.bot.send_message(
-                    update.message.chat.id,
-                    text="No post selected,try again",
-                    reply_to_message_id=update.message.id,
-                )
-            else:
-                entities = {
-                    "caption": update.message.reply_to_message.caption,
-                }
-                if update.message.reply_to_message.caption_entities:
-                    for entity in update.message.reply_to_message.caption_entities:
-                        if entity.type == MessageEntityType.TEXT_LINK:
-                            entities["url"] = entity.url
-                if update.message.reply_to_message.photo:
-                    photos = {}
-                    for photo in update.message.reply_to_message.photo:
-                        photos[photo.file_size] = photo
-                    Path(f"data/{app.page_id}").mkdir(parents=True, exist_ok=True)
-                    path = f"data/{app.page_id}/{photo.file_unique_id}.jpg"
-                    file = await context.bot.get_file(photos[max(photos)])
-                    await file.download_to_drive(path)
-                    entities["path"] = path
-                    return True, entities
-                else:
-                    app.logger.warning("No image in selected post")
-                    await context.bot.send_message(
-                        update.message.chat.id,
-                        text="No image in selected post,try again",
-                        reply_to_message_id=update.message.id,
-                    )
-                    return False, {}
-    else:
-        app.logger.info(f"chat {update.message.chat} not intresting")
-    return False, {}
