@@ -5,3 +5,5 @@ secrets/*
 tests.py
 Python-3.10.6
 *.tgz
+*.session
+tests_*
