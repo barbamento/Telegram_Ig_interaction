@@ -266,6 +266,26 @@ files = [
 ]
 
 [[package]]
+name = "heyoo"
+version = "0.1.0"
+description = "Opensource Python wrapper to WhatsApp Cloud API"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "heyoo-0.1.0-py3-none-any.whl", hash = "sha256:8777410d26366a4060c1dd5c0b1a78f9949344b2de0d6a08c817bc76a8f13690"},
+]
+
+[package.dependencies]
+colorama = "*"
+requests = ">=2.28.1"
+requests-toolbelt = ">=0.9.1"
+typing = "*"
+
+[package.extras]
+test = ["pytest (==7.1.3)", "python-dotenv (==0.20.0)"]
+
+[[package]]
 name = "httpcore"
 version = "0.18.0"
 description = "A minimal low-level HTTP client."
@@ -644,6 +664,21 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "requests-toolbelt"
+version = "1.0.0"
+description = "A utility belt for advanced users of python-requests"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "requests-toolbelt-1.0.0.tar.gz", hash = "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6"},
+    {file = "requests_toolbelt-1.0.0-py2.py3-none-any.whl", hash = "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06"},
+]
+
+[package.dependencies]
+requests = ">=2.0.1,<3.0.0"
+
+[[package]]
 name = "sniffio"
 version = "1.3.0"
 description = "Sniff out which async library your code is running under"
@@ -746,6 +781,18 @@ files = [
 ]
 
 [[package]]
+name = "typing"
+version = "3.7.4.3"
+description = "Type Hints for Python"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "typing-3.7.4.3-py2-none-any.whl", hash = "sha256:283d868f5071ab9ad873e5e52268d611e851c870a2ba354193026f2dfb29d8b5"},
+    {file = "typing-3.7.4.3.tar.gz", hash = "sha256:1187fb9c82fd670d10aa07bbb6cfcfe4bdda42d6fab8d5134f04e8c4d0b71cc9"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.8.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -778,4 +825,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.13"
-content-hash = "2c329a9d64aa46553d52e1415fc6d5b940698db752d8c20510206071a1c65729"
+content-hash = "115118ced0c7b0e4098bbad96297384f5884e236644c9d22cc01454c54daf777"

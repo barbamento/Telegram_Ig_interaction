@@ -24,18 +24,16 @@ class PyroUser:
     async def send_message_to_bot(self, app: Client, message: Message):
         message: dict = json.loads(str(message))
         if message["_"] == "Message":
-            if str(message["chat"]["id"]) == ["-1001909202660"]:
+            if str(message["chat"]["id"]) in ["-1001909202660"]:
                 if "forward_from_chat" in message.keys():
-                    if str(message["forward_from_chat"]) == "-1002096140849":
-                        # await self.app.forward_messages(
-                        #    "NotizieIABot",
-                        #    "-1002096140849",
-                        #    message["forward_from_message_id"],
-                        # )
+                    if str(message["forward_from_chat"]["id"]) == "-1002096140849":
                         comand = await app.send_message(
                             "-1001909202660", "/post", reply_to_message_id=message["id"]
                         )
+                        self.logger.info(f"comand : {comand}")
                         time.sleep(30)
                         await app.delete_messages(
                             "-1001909202660", json.loads(str(comand))["id"]
                         )
+                else:
+                    self.logger.info(f"message : {message}")
